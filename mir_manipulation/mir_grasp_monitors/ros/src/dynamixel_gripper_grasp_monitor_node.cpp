@@ -23,18 +23,32 @@ DynamixelGripperGraspMonitorNode::DynamixelGripperGraspMonitorNode() :
     sub_dynamixel_motor_states_ = nh.subscribe("dynamixel_motor_states", 10, &DynamixelGripperGraspMonitorNode::jointStatesCallback, this);
     sub_object_name_ = nh.subscribe("object_name", 10, &DynamixelGripperGraspMonitorNode::objectNameCallback, this);
 
-
-    addThreshold("bearing", 0.12);
-    addThreshold("distance_tube", 0.12);
-    addThreshold("bearing_box", 0.15);
-    addThreshold("motor", 0.18);
-    addThreshold("s40_40_g", 0.15);
-    addThreshold("s40_40_b", 0.15);
-    addThreshold("m30", 0.15);
-    addThreshold("m20", 0.12);
-    addThreshold("r20", 0.12);
-    addThreshold("f20_20_g", 0.08);
-    addThreshold("f20_20_b", 0.08);
+    // youbot_2: empty: 0.03
+    //addThreshold("bearing", 0.12);
+    //addThreshold("distance_tube", 0.12);
+    //addThreshold("bearing_box", 0.15);
+    //addThreshold("motor", 0.18);
+    //addThreshold("s40_40_g", 0.15);
+    //addThreshold("s40_40_b", 0.15);
+    //addThreshold("m30", 0.15);
+    //addThreshold("m20", 0.12);
+    //addThreshold("r20", 0.12);
+    //addThreshold("f20_20_g", 0.08);
+    //addThreshold("f20_20_b", 0.08);
+    
+    // youbot 4: empty: 0.09
+    addThreshold("bearing", 0.15);
+    addThreshold("distance_tube", 0.15);
+    addThreshold("bearing_box", 0.20);
+    addThreshold("motor", 0.20);
+    addThreshold("s40_40_g", 0.19);
+    addThreshold("s40_40_b", 0.19);
+    addThreshold("m30", 0.20);
+    addThreshold("m20", 0.15);
+    addThreshold("r20", 0.15);
+    addThreshold("f20_20_g", 0.13);
+    addThreshold("f20_20_b", 0.13);
+;
 }
 
 
