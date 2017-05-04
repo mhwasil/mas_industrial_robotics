@@ -8,8 +8,7 @@ import smach
 import smach_ros
 import math
 import std_msgs.msg
-import dynamixel_msgs.msg
-# import of generic states
+import dynamixel_msgs.msg# import of generic states
 # generic states
 import mir_states.common.basic_states as gbs_o
 import mir_states.common.navigation_states as gns_o
@@ -39,8 +38,8 @@ class wait_for_object(smach.State):
     def __init__(self):
         smach.State.__init__(self, outcomes=['succeeded', 'failed'])
         self.result = None
-        self.img_editor = rospy.Publisher('/mcr_perception/edit_image/event_in',std_msgs.msg.String)
-        self.event_out = rospy.Publisher('/mcr_perception/background_change_detection/event_in', std_msgs.msg.String)
+        self.img_editor = rospy.Publisher('/mcr_perception/edit_image/event_in',std_msgs.msg.String, queue_size=11)
+        self.event_out = rospy.Publisher('/mcr_perception/background_change_detection/event_in', std_msgs.msg.String, queue_size=10)
 
         rospy.Subscriber('/mcr_perception/background_change_detection/event_out', std_msgs.msg.String, self.event_cb)
 
@@ -84,8 +83,8 @@ class cbt_release(smach.State):
 
     def execute(self, userdata):
         #TODO TIMING
-        gms_o.gripper_command.set_named_target("open")
-        gms_o.gripper_command.go()
+        gms_o.control_gripper('open_wide')
+        #gms_o.gripper_command.go()
         rospy.sleep(3.0)
         return 'succeeded'
 
@@ -98,9 +97,9 @@ class cbt_grasp(smach.State):
         #TODO TIMING
         #gms_o.control_gripper("close")
         #rospy.sleep(1)
-        gms_o.gripper_command.set_named_target("close")
-        gms_o.gripper_command.go()
-        rospy.sleep(1.0)
+        gms_o.control_gripper('close')
+        #gms_o.gripper_command.go()
+        rospy.sleep(3.0)
         return 'succeeded'
 
 class cbt_grasp_relese(smach.State):
@@ -109,11 +108,11 @@ class cbt_grasp_relese(smach.State):
 
     def execute(self, userdata):
         #TODO TIMING
-        #gms_o.control_gripper("close")
+        gms_o.control_gripper("open")
         #rospy.sleep(3.5)
-        gms_o.gripper_command.set_named_target("open")
-        gms_o.gripper_command.go()
-        rospy.sleep(0.5)
+        #gms_o.gripper_command.set_named_target("open")
+        #gms_o.gripper_command.go()
+        rospy.sleep(2.0)
         return 'succeeded'
 
 class get_cbt_task(smach.State):
@@ -168,8 +167,11 @@ def main(simulation=False):
     use_mockup=False
 
     with SM:
-        smach.StateMachine.add('OPEN_GRIPPER',  cbt_grasp_relese(),
+        smach.StateMachine.add('OPEN_GRIPPER',  gms_o.control_gripper('open_wide'),
             transitions={'succeeded': 'ARM_TO_CONVEYOR_VIEW'})
+
+        #smach.StateMachine.add('OPEN_GRIPPER_2', gms_o.control_gripper('close'),
+         #   transitions={'succeeded': 'ARM_TO_CONVEYOR_VIEW'})
 
         smach.StateMachine.add('ARM_TO_CONVEYOR_VIEW', gms_o.move_arm(
            # [2.2187, 1.85767, -1.5741, 3.2046, 1.3840]),
@@ -218,7 +220,7 @@ def main(simulation=False):
         #    transitions={'succeeded': 'CBT_GRASP',
         #                'failed': 'ARM_TO_GRASP'})
 
-        smach.StateMachine.add('CBT_GRASP', cbt_grasp(),
+        smach.StateMachine.add('CBT_GRASP', gms_o.control_gripper('close'),
             transitions={'succeeded': 'ARM_TO_PLACING_POSE_2'})
 
         #smach.StateMachine.add('ARM_TO_INTERMEDIATE_POSE', gms_o.move_arm("pre_grasp"),
