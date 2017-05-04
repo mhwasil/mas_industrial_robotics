@@ -14,41 +14,24 @@ DynamixelGripperGraspMonitorNode::DynamixelGripperGraspMonitorNode() :
     loop_rate_init_state_(ros::Rate(100.0))
 {
     ros::NodeHandle nh("~");
-
-    nh.param("load_threshold", load_threshold_, 0.3);
     nh.param("position_error_threshold", position_error_threshold_, 0.1);
-
     pub_event_ = nh.advertise<std_msgs::String>("event_out", 1);
     sub_event_ = nh.subscribe("event_in", 10, &DynamixelGripperGraspMonitorNode::eventCallback, this);
     sub_dynamixel_motor_states_ = nh.subscribe("dynamixel_motor_states", 10, &DynamixelGripperGraspMonitorNode::jointStatesCallback, this);
     sub_object_name_ = nh.subscribe("object_name", 10, &DynamixelGripperGraspMonitorNode::objectNameCallback, this);
 
-    // youbot_2: empty: 0.03
-    //addThreshold("bearing", 0.12);
-    //addThreshold("distance_tube", 0.12);
-    //addThreshold("bearing_box", 0.15);
-    //addThreshold("motor", 0.18);
-    //addThreshold("s40_40_g", 0.15);
-    //addThreshold("s40_40_b", 0.15);
-    //addThreshold("m30", 0.15);
-    //addThreshold("m20", 0.12);
-    //addThreshold("r20", 0.12);
-    //addThreshold("f20_20_g", 0.08);
-    //addThreshold("f20_20_b", 0.08);
-    
-    // youbot 4: empty: 0.09
-    addThreshold("bearing", 0.15);
-    addThreshold("distance_tube", 0.15);
-    addThreshold("bearing_box", 0.20);
-    addThreshold("motor", 0.20);
-    addThreshold("s40_40_g", 0.19);
-    addThreshold("s40_40_b", 0.19);
-    addThreshold("m30", 0.20);
-    addThreshold("m20", 0.15);
-    addThreshold("r20", 0.15);
-    addThreshold("f20_20_g", 0.13);
-    addThreshold("f20_20_b", 0.13);
-;
+
+
+    addThreshold("bearing", position_error_threshold_ );
+    addThreshold("distance_tube", position_error_threshold_);
+    addThreshold("bearing_box", position_error_threshold_);
+    addThreshold("motor", position_error_threshold_);
+    addThreshold("s40_40_g", position_error_threshold_);
+    addThreshold("s40_40_b", position_error_threshold_);
+    addThreshold("m30", position_error_threshold_);
+    addThreshold("m20", position_error_threshold_);
+    addThreshold("r20", position_error_threshold_);
+
 }
 
 
@@ -154,15 +137,15 @@ void DynamixelGripperGraspMonitorNode::run_state()
 
 bool DynamixelGripperGraspMonitorNode::isObjectGrasped()
 {
-    ROS_DEBUG("load:     %f, threshold: %f", std::abs(joint_states_->load), load_threshold_);
-    ROS_DEBUG("position error: %f, threshold: %f", std::abs(joint_states_->error), position_error_threshold_);
     if(object_threshold_map.find(object_name_) == object_threshold_map.end()){
       return true;
     }
-    if (std::abs(joint_states_->load) >= object_threshold_map[object_name_]) {
+    ROS_INFO("object: %s, position error: %f, threshold: %f", object_name_.c_str(), std::abs(joint_states_->error), object_threshold_map[object_name_]);
+    if (std::abs(joint_states_->error) >= object_threshold_map[object_name_]) {
         return true;
     }
     return false;
+
 }
 
 int main(int argc, char **argv)
