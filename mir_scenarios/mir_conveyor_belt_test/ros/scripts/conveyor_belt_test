@@ -204,7 +204,7 @@ def main(simulation=False):
         '''
         smach.StateMachine.add('GET_TASK', get_cbt_task(),
             transitions={'task_received': 'MOVE_TO_CONVEYOR'})
-        '''
+        
 
         if use_mockup:
             smach.StateMachine.add('MOVE_TO_CONVEYOR', for_testing(),
@@ -220,7 +220,7 @@ def main(simulation=False):
                 transitions={'succeeded': 'OPEN_GRIPPER',
                             'failed': 'ARM_TO_CONVEYOR_VIEW'})
        
-       
+       '''
         #smach.StateMachine.add('ARM_TO_CONVEYOR_VIEW', gms_o.move_arm("pre_grasp"),
 
         #smach.StateMachine.add('PAUSE', my_pause(),
@@ -246,7 +246,7 @@ def main(simulation=False):
         
         smach.StateMachine.add('WAIT_FOR_OBJECT', wait_for_object(),
              transitions={'succeeded': 'WAIT_TO_CLOSE_GRIPPER',
-                         'failed': 'ARM_TO_CONVEYOR_VIEW'})
+                         'failed': 'OPEN_NARROW'})
         '''     
         smach.StateMachine.add('ARM_TO_CONVEYOR_VIEW2', gms_o.move_arm(
             # [2.2187, 1.85767, -1.5741, 3.2046, 1.3840]),
