@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 import sys
-import atwork_ros_msgs.msg
+#import atwork_ros_msgs.msg
 import rospy
 
 import smach
@@ -30,8 +30,8 @@ class my_pause(smach.State):
         smach.State.__init__(self, outcomes=['succeeded'])
 
     def execute(self, userdata):
-        rospy.sleep(2.0)
-        #rospy.logerror("I HAVE SLEPT")
+        rospy.sleep(0.7)
+        rospy.loginfo("I HAVE SLEPT")
         return 'succeeded'
 
 class wait_for_object(smach.State):
@@ -207,8 +207,30 @@ def main(simulation=False):
 
         #TODO
         smach.StateMachine.add('WAIT_FOR_OBJECT', wait_for_object(),
-            transitions={'succeeded': 'CBT_GRASP',
-                        'failed': 'WAIT_FOR_OBJECT'})
+            transitions={'succeeded': 'WAIT_TO_CLOSE_GRIPPER',
+                        'failed': 'ARM_TO_CONVEYOR_VIEW2'})
+
+        smach.StateMachine.add('ARM_TO_CONVEYOR_VIEW2', gms_o.move_arm(
+           # [2.2187, 1.85767, -1.5741, 3.2046, 1.3840]),
+           # [2.19647672522, 2.1781809757, -1.77540825632 ,3.10630504597, 4.40075183871]),
+           [2.20925454919, 1.98791323601 ,-1.38040010402 ,2.87320772063, 4.35358370112]),
+           transitions={'succeeded': 'WAIT_FOR_OBJECT2',
+                        'failed': 'ARM_TO_CONVEYOR_VIEW2'})
+
+        smach.StateMachine.add('WAIT_FOR_OBJECT2', wait_for_object(),
+            transitions={'succeeded': 'WAIT_TO_CLOSE_GRIPPER',
+                        'failed': 'ARM_TO_CONVEYOR_VIEW3'})
+
+        smach.StateMachine.add('ARM_TO_CONVEYOR_VIEW3', gms_o.move_arm(
+           # [2.2187, 1.85767, -1.5741, 3.2046, 1.3840]),
+           # [2.19647672522, 2.1781809757, -1.77540825632 ,3.10630504597, 4.40075183871]),
+           [2.20925454919, 1.98791323601 ,-1.38040010402 ,2.87320772063, 4.35358370112]),
+           transitions={'succeeded': 'WAIT_FOR_OBJECT3',
+                        'failed': 'ARM_TO_CONVEYOR_VIEW3'})
+
+        smach.StateMachine.add('WAIT_FOR_OBJECT3', wait_for_object(),
+            transitions={'succeeded': 'WAIT_TO_CLOSE_GRIPPER',
+                        'failed': 'WAIT_FOR_OBJECT3'})
 
         #smach.StateMachine.add('GO_TO_GRASP_POSE', gms_o.move_arm(
          #   #[2.2186, 2.01376, -1.5741, 3.0410, 1.3842]),
@@ -219,6 +241,9 @@ def main(simulation=False):
         #smach.StateMachine.add('ARM_TO_GRASP', gms_o.move_arm("grasp_cbt"),
         #    transitions={'succeeded': 'CBT_GRASP',
         #                'failed': 'ARM_TO_GRASP'})
+
+        smach.StateMachine.add('WAIT_TO_CLOSE_GRIPPER', my_pause(),
+            transitions={'succeeded': 'CBT_GRASP'})
 
         smach.StateMachine.add('CBT_GRASP', gms_o.control_gripper('close'),
             transitions={'succeeded': 'ARM_TO_PLACING_POSE_2'})
