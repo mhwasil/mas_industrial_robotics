@@ -8,6 +8,7 @@ import smach
 import smach_ros
 import math
 import std_msgs.msg
+import random
 import dynamixel_msgs.msg# import of generic states
 # generic states
 import mir_states.common.basic_states as gbs_o
@@ -83,8 +84,9 @@ class my_pause(smach.State):
         smach.State.__init__(self, outcomes=['succeeded'])
 
     def execute(self, userdata):
-        rospy.sleep(0.4)
-        rospy.loginfo("I HAVE SLEPT")
+        sleep_time = 0.4 + 0.3*random.random()
+        rospy.sleep(sleep_time)
+        rospy.loginfo("I HAVE SLEPT %f", sleep_time)
         return 'succeeded'
 
 class wait_for_object(smach.State):

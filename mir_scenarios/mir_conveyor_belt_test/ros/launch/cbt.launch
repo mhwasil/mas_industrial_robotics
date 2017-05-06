@@ -27,6 +27,6 @@
     
     <include file="$(find mcr_background_change_detection)/ros/launch/background_change_detection.launch"/>
     <include file="$(find mcr_edit_image)/ros/launch/edit_image.launch"/>
-    <node name="conveyor_belt_test" pkg="mir_conveyor_belt_test" type="conveyor_belt_test" />
+    <node name="conveyor_belt_test" pkg="mir_conveyor_belt_test" type="conveyor_belt_test" output="screen"/>
     <!--include file="$(find atwork_refbox_ros_client)/ros/launch/b-it-bots-cfh1.launch" /-->
 </launch>
