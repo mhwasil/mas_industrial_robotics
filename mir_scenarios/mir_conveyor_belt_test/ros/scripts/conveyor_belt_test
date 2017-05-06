@@ -26,6 +26,7 @@ import mir_states.common.basic_states as gbs
 
 import mir_states.common.perception_mockup_util as perception_mockup_util
 from mcr_perception_msgs.msg import ObjectList, Object
+from mir_yb_action_msgs.msg import StageObjectAction, StageObjectGoal
 
 class move_base_safe(smach.State):
     def __init__(self, destination_location, timeout=120.0, action_server='move_base_safe_server'):
@@ -48,6 +49,33 @@ class move_base_safe(smach.State):
             return 'succeeded'
         else:
             return 'failed'
+
+class place_object(smach.State):
+    def __init__(self, timeout=120.0, action_server='stage_object_server'):
+        smach.State.__init__(self, outcomes=['succeeded', 'failed'])
+        self.timeout = timeout
+        self.action_server = action_server
+        self.client = actionlib.SimpleActionClient(action_server, StageObjectAction)
+        self.client.wait_for_server()
+        self.platform_poses = ["platform_right", "platform_middle", "platform_left"]
+        self.counter = 0
+
+    def execute(self, userdata):
+        goal = StageObjectGoal()
+        goal.robot_platform = self.platform_poses[self.counter]
+        self.counter = self.counter + 1
+        if self.counter >= len(self.platform_poses):
+            self.counter = 0
+        #rospy.loginfo('Sending actionlib goal to ' + self.action_server + ', destination: ',
+        #              goal.destination_location + ' with timeout: ' + str(self.timeout))
+        self.client.send_goal(goal)
+        self.client.wait_for_result(rospy.Duration.from_sec(self.timeout))
+        res = self.client.get_result()
+        if res and res.success:
+            return 'succeeded'
+        else:
+            return 'failed'
+
 
 
 class my_pause(smach.State):
@@ -201,7 +229,7 @@ def main(simulation=False):
             #transitions={'succeeded':'GET_TASK'})
            # transitions={'succeeded':'ARM_TO_CONVEYOR_VIEW'})
 
-        '''
+       
         smach.StateMachine.add('GET_TASK', get_cbt_task(),
             transitions={'task_received': 'MOVE_TO_CONVEYOR'})
         
@@ -220,7 +248,7 @@ def main(simulation=False):
                 transitions={'succeeded': 'OPEN_GRIPPER',
                             'failed': 'ARM_TO_CONVEYOR_VIEW'})
        
-       '''
+       
         #smach.StateMachine.add('ARM_TO_CONVEYOR_VIEW', gms_o.move_arm("pre_grasp"),
 
         #smach.StateMachine.add('PAUSE', my_pause(),
@@ -305,7 +333,11 @@ def main(simulation=False):
            # transitions={'succeeded': 'ARM_TO_PLACING_POSE',
            #            'failed': 'ARM_TO_PLACING_POSE'}
 
-        smach.StateMachine.add('ARM_TO_PLACING_POSE_2', gms_o.move_arm("platform_middle"),
+        #smach.StateMachine.add('ARM_TO_PLACING_POSE_2', gms_o.move_arm("platform_middle"),
+         #   transitions={'succeeded': 'OPEN_NARROW',
+          #              'failed': 'ARM_TO_PLACING_POSE_2'})
+        
+        smach.StateMachine.add('ARM_TO_PLACING_POSE_2', place_object(),
             transitions={'succeeded': 'OPEN_NARROW',
                         'failed': 'ARM_TO_PLACING_POSE_2'})
         #smach.StateMachine.add('ARM_TO_REAR_PLATFORM', gms_o.move_arm("platform_left"),
