@@ -6,7 +6,7 @@
 
   <arg name="paused" default="false"/>
   <arg name="use_sim_time" default="true"/>
-  <arg name="gui" default="false"/>
+  <arg name="gui" default="true"/>
 
   <arg name="init_pos_x" default="0.0"/>
   <arg name="init_pos_y" default="0.0"/>
@@ -23,6 +23,10 @@
     <arg name="use_sim_time" value="$(arg use_sim_time)" />
     <arg name="gui" value="$(arg gui)" />
   </include>
+<!-- spawn objects -->
+  <!--include file="$(find mcr_gazebo_objects)/ros/launch/spawn_objects.launch"> 
+    <arg name="param_obj_preffix" value="nut" />
+  </include-->
 
   <!-- upload robot description -->
   <param name="robot_description" command="$(find xacro)/xacro.py $(find mir_hardware_config)/$(arg robot)/urdf/robot.urdf.xacro" />
