@@ -66,7 +66,11 @@
 
   <!-- 3D camera on arm -->
   <xacro:intel_realsense_f200_camera name="arm_cam3d" parent="camera_mount_link">
+<<<<<<< HEAD
     <origin xyz="-0.05 0.01 0.03" rpy="0.0 -${M_PI/2 - 0.03} 0.0" />
+=======
+    <origin xyz="-0.05 0.0 0.03" rpy="0.0 -${M_PI/2 - 0.03} 0.0" />
+>>>>>>> b19fbecb776759a8242144b95400591b75a30e55
   </xacro:intel_realsense_f200_camera>
 
   
