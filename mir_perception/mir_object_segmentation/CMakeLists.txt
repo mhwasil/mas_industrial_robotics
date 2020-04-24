@@ -80,9 +80,33 @@ target_link_libraries(scene_segmentation_node
 roslint_cpp()
 
 ### TESTS
+#if(CATKIN_ENABLE_TESTING)
+#  find_package(roslaunch REQUIRED)
+#  add_rostest_gtest(ros/test/object_segmentation_test.cpp)
+#  roslaunch_add_file_check(ros/launch)
+#endif()
+
+
+
 if(CATKIN_ENABLE_TESTING)
+  find_package(rostest REQUIRED)
   find_package(roslaunch REQUIRED)
+
   roslaunch_add_file_check(ros/launch)
+
+  add_rostest_gtest(
+    object_segmentation_test
+    ros/launch/scene_segmentation_test.test
+    ros/test/object_segmentation_test.cpp
+  )
+  target_link_libraries(
+    object_segmentation_test
+    ${catkin_LIBRARIES}
+  )
+  add_dependencies(
+    object_segmentation_test
+    ${catkin_EXPORTED_TARGETS}
+  )
 endif()
 
 ### INSTALLS
