@@ -28,5 +28,6 @@
   <run_depend>visualization_msgs</run_depend>
 
   <test_depend>roslaunch</test_depend>
+  <test_depend>rosunit</test_depend>
 
 </package>
